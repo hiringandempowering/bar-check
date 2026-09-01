@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BarCheck by Hiring &amp; Empowering Solutions — Find an attorney's license status</title>
+<meta name="description" content="Look up any U.S. attorney's license status straight from the official state bar directory. A free tool from Hiring & Empowering Solutions.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#202356;      /* sampled from the H&E logo ink */
+    --navy-2:#2C3070;
+    --marigold:#D37738;  /* sampled from the H&E logo arc */
+    --coral:#B8542F;
+    --cream:#FBF8F1;
+    --paper:#FFFFFF;
+    --ink:#1B2333;
+    --ink-soft:#5B6478;
+    --line:#E4DFD3;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+  }
+  h1,h2,h3,.brand{
+    font-family:'Space Grotesk', sans-serif;
+  }
+
+  header{
+    background:var(--navy);
+    color:var(--cream);
+    padding:48px 24px 40px;
+  }
+  .header-inner{
+    max-width:920px;
+    margin:0 auto;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:28px;
+  }
+  .brand svg{ flex-shrink:0; }
+  header h1{
+    font-size:clamp(28px, 4vw, 40px);
+    line-height:1.15;
+    margin:0 0 12px;
+    max-width:14ch;
+    font-weight:600;
+  }
+  header p{
+    color:#C7CEE2;
+    font-size:16px;
+    line-height:1.6;
+    max-width:52ch;
+    margin:0 0 28px;
+  }
+
+  .search-wrap{
+    position:relative;
+    max-width:420px;
+  }
+  .search-wrap input{
+    width:100%;
+    padding:14px 16px 14px 44px;
+    border-radius:10px;
+    border:1px solid transparent;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:15px;
+    outline:none;
+  }
+  .search-wrap input:focus{
+    outline:2px solid var(--marigold);
+    outline-offset:1px;
+  }
+  .search-wrap svg{
+    position:absolute;
+    left:14px;
+    top:50%;
+    transform:translateY(-50%);
+    opacity:0.45;
+  }
+
+  main{
+    max-width:920px;
+    margin:0 auto;
+    padding:36px 24px 80px;
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .meta-row .count{
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
+    gap:12px;
+  }
+
+  .card{
+    display:block;
+    text-align:left;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px 16px 14px;
+    cursor:pointer;
+    text-decoration:none;
+    color:inherit;
+    transition:border-color .12s ease, transform .12s ease;
+    position:relative;
+  }
+  .card:hover{
+    border-color:var(--navy);
+    transform:translateY(-1px);
+  }
+  .card:focus-visible{
+    outline:2px solid var(--coral);
+    outline-offset:2px;
+  }
+  .card .state-name{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:16px;
+    margin-bottom:6px;
+    padding-right:20px;
+  }
+  .card .status{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .status.available{ color:#3E7C4A; }
+  .status.limited{ color:var(--coral); }
+  .status-dot{
+    width:6px; height:6px; border-radius:50%;
+    background:currentColor;
+    flex-shrink:0;
+  }
+  .card .arrow{
+    position:absolute;
+    top:16px; right:14px;
+    color:var(--marigold);
+    opacity:0;
+    transition:opacity .12s ease;
+  }
+  .card:hover .arrow{ opacity:1; }
+
+  .no-results{
+    padding:40px 0;
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:15px;
+    display:none;
+  }
+
+  .note-band{
+    margin-top:36px;
+    background:#FDF3E2;
+    border:1px solid #EBD9AE;
+    border-radius:10px;
+    padding:16px 18px;
+    font-size:13.5px;
+    line-height:1.6;
+    color:#5A4B22;
+  }
+  .note-band strong{ color:#3E3312; }
+
+  footer{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 24px 60px;
+    color:var(--ink-soft);
+    font-size:12.5px;
+    line-height:1.6;
+  }
+
+  /* ---------- Hiring & Empowering Solutions logo bar ---------- */
+  .topbar{
+    background:var(--paper);
+    border-bottom:3px solid var(--marigold);
+  }
+  .topbar-inner{
+    max-width:920px;
+    margin:0 auto;
+    padding:14px 24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+  }
+  .topbar-logo{
+    display:inline-flex;
+    align-items:center;
+    line-height:0;
+  }
+  .topbar-logo img{
+    height:56px;
+    width:auto;
+    display:block;
+  }
+  .topbar-logo:focus-visible{
+    outline:2px solid var(--marigold);
+    outline-offset:4px;
+    border-radius:4px;
+  }
+  .topbar-link{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    color:var(--navy);
+    text-decoration:none;
+    border-bottom:2px solid var(--marigold);
+    padding-bottom:2px;
+    white-space:nowrap;
+  }
+  .topbar-link:hover{ color:var(--marigold); }
+  .topbar-link:focus-visible{
+    outline:2px solid var(--marigold);
+    outline-offset:4px;
+  }
+
+  /* ---------- Pop-up advertisement ---------- */
+  .promo-scrim{
+    position:fixed;
+    inset:0;
+    background:rgba(32,35,86,0.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:100;
+  }
+  .promo-scrim.is-open{ display:flex; }
+  .promo{
+    background:var(--paper);
+    color:var(--ink);
+    width:100%;
+    max-width:560px;
+    max-height:calc(100vh - 40px);
+    overflow:auto;
+    border-radius:14px;
+    border-top:6px solid var(--marigold);
+    box-shadow:0 24px 60px rgba(20,24,60,0.35);
+    padding:28px 28px 24px;
+    position:relative;
+  }
+  .promo:focus{ outline:none; }
+  .promo-scrim.is-open .promo{
+    animation:promo-in .28s ease-out;
+  }
+  @keyframes promo-in{
+    from{ opacity:0; transform:translateY(12px); }
+    to{ opacity:1; transform:none; }
+  }
+  .promo-close{
+    position:absolute;
+    top:12px; right:12px;
+    width:36px; height:36px;
+    border:0;
+    border-radius:50%;
+    background:transparent;
+    color:var(--ink-soft);
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0;
+  }
+  .promo-close:hover{ background:var(--cream); color:var(--navy); }
+  .promo-close:focus-visible{
+    outline:2px solid var(--marigold);
+    outline-offset:2px;
+  }
+  .promo-logo{
+    height:48px;
+    width:auto;
+    display:block;
+    margin:4px 0 20px;
+  }
+  .promo h2{
+    font-size:24px;
+    line-height:1.2;
+    margin:0 0 10px;
+    color:var(--navy);
+    font-weight:600;
+    padding-right:28px;
+  }
+  .promo p{
+    margin:0 0 14px;
+    font-size:15px;
+    line-height:1.6;
+    color:var(--ink);
+  }
+  .promo ul{
+    margin:0 0 22px;
+    padding:0;
+    list-style:none;
+    font-size:14.5px;
+    line-height:1.55;
+  }
+  .promo li{
+    padding:9px 0 9px 18px;
+    border-top:1px solid var(--line);
+    position:relative;
+  }
+  .promo li:last-child{ border-bottom:1px solid var(--line); }
+  .promo li::before{
+    content:"";
+    position:absolute;
+    left:0; top:17px;
+    width:7px; height:7px;
+    border-radius:50%;
+    background:var(--marigold);
+  }
+  .promo-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+  }
+  .btn{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+    text-decoration:none;
+    border-radius:8px;
+    padding:12px 16px;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+    border:1.5px solid transparent;
+  }
+  .btn-primary{
+    background:var(--navy);
+    color:#fff;
+  }
+  .btn-primary:hover{ background:var(--navy-2); }
+  .btn-secondary{
+    background:transparent;
+    color:var(--navy);
+    border-color:var(--navy);
+  }
+  .btn-secondary:hover{ background:var(--cream); }
+  .btn:focus-visible{
+    outline:2px solid var(--marigold);
+    outline-offset:2px;
+  }
+  .promo-foot{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-top:18px;
+  }
+  .promo-dismiss{
+    background:none;
+    border:0;
+    color:var(--ink-soft);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14px;
+    cursor:pointer;
+    padding:8px 4px;
+    text-decoration:underline;
+    text-underline-offset:3px;
+  }
+  .promo-dismiss:hover{ color:var(--navy); }
+  .promo-dismiss:focus-visible{
+    outline:2px solid var(--marigold);
+    outline-offset:2px;
+    border-radius:4px;
+  }
+  .promo-phone{
+    margin:0;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .promo-phone a{ color:var(--navy); font-weight:500; text-underline-offset:3px; }
+  body.promo-lock{ overflow:hidden; }
+
+  @media (prefers-reduced-motion: reduce){
+    .promo-scrim.is-open .promo{ animation:none; }
+    .card{ transition:none; }
+  }
+
+  @media (max-width:520px){
+    .grid{ grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); }
+    .topbar-inner{ padding:12px 16px; }
+    .topbar-logo img{ height:44px; }
+    .topbar-link{ display:none; }
+    .promo-scrim{ padding:12px; align-items:flex-end; }
+    .promo{ padding:24px 20px 20px; max-height:calc(100vh - 24px); }
+    .promo h2{ font-size:21px; }
+    .promo-actions .btn{ width:100%; justify-content:center; }
+    .promo-foot{ flex-direction:column; align-items:flex-start; gap:4px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-logo" href="https://hiringandempowering.com/" target="_blank" rel="noopener noreferrer" aria-label="Hiring &amp; Empowering Solutions — visit hiringandempowering.com">
+      <img data-logo alt="Hiring &amp; Empowering Solutions" width="234" height="56">
+    </a>
+    <a class="topbar-link" href="https://hiringandempowering.com/book-a-clarity-call/" target="_blank" rel="noopener noreferrer">Book a free Clarity Call</a>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+        <circle cx="13" cy="13" r="9.5" stroke="#D37738" stroke-width="2.4"/>
+        <path d="M20 20L26.5 26.5" stroke="#D37738" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M9 13.3L11.8 16.1L17.3 10" stroke="#FBF8F1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      BarCheck
+    </div>
+    <h1>Look up any attorney's license status, straight from the source.</h1>
+    <p>Pick a state to jump to its official bar directory — no scraping, no third-party data brokers. Just the licensing board's own record of who's active, inactive, or under discipline.</p>
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="7" cy="7" r="5.5" stroke="#202356" stroke-width="1.6"/>
+        <path d="M11 11L14.5 14.5" stroke="#202356" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <input type="text" id="stateSearch" placeholder="Type a state name…" autocomplete="off">
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="meta-row">
+    <span class="count" id="resultCount">51 jurisdictions</span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="no-results" id="noResults">No state matches that search.</div>
+
+  <div class="note-band">
+    <strong>Before you click:</strong> a few sites (New Hampshire, New Jersey, South Dakota) don't publish a searchable directory online — you'll need to call or email the bar directly, and the card will say so. Some states also let attorneys in good standing opt out of the public directory. If a page won't load, the state site may be temporarily down, or — if you're outside the US — may be geofenced; a US-based VPN can help in that case.
+  </div>
+</main>
+
+<footer>
+  BarCheck is a free tool from <a href="https://hiringandempowering.com/" target="_blank" rel="noopener noreferrer" style="color:var(--navy);font-weight:500;">Hiring &amp; Empowering Solutions&reg;</a>. It links directly to each jurisdiction's own licensing authority and doesn't store, scrape, or resell any attorney data — every search happens on the state's own website.
+</footer>
+
+<!-- Pop-up advertisement: Hiring & Empowering Solutions -->
+<div class="promo-scrim" id="promoScrim">
+  <div class="promo" id="promo" role="dialog" aria-modal="true" aria-labelledby="promoTitle" aria-describedby="promoBody" tabindex="-1">
+    <button class="promo-close" id="promoClose" type="button" aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M3 3L13 13M13 3L3 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <img class="promo-logo" data-logo alt="Hiring &amp; Empowering Solutions" width="201" height="48">
+    <h2 id="promoTitle">Checking the license is the easy part of the hire.</h2>
+    <p id="promoBody">Finding someone your firm can actually count on is the hard part. Hiring &amp; Empowering Solutions&reg; has done exactly that for law firms since 1997, and more than 5,000 firms have worked with founder Molly McGrath.</p>
+    <ul>
+      <li>Flat-fee legal staffing through Smart Hire&reg;, so you're paying strategic hiring advisors, not a contingency recruiter filling a seat.</li>
+      <li>The Law Firm Admin Bootcamp + Academy&trade; trains the team you already have to run the firm without you in every decision.</li>
+      <li>The 66-Day Law Firm Turnaround when operations, not one open role, are the real problem.</li>
+    </ul>
+    <div class="promo-actions">
+      <a class="btn btn-primary" href="https://hiringandempowering.com/" target="_blank" rel="noopener noreferrer">Visit hiringandempowering.com</a>
+      <a class="btn btn-secondary" href="https://hiringandempowering.com/book-a-clarity-call/" target="_blank" rel="noopener noreferrer">Book a free Clarity Call</a>
+    </div>
+    <div class="promo-foot">
+      <p class="promo-phone">Prefer to talk? Call <a href="tel:+13035322784">(303) 532-2784</a>.</p>
+      <button class="promo-dismiss" id="promoDismiss" type="button">Maybe later</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const states = [
+  {name:"Alabama", url:"https://members.alabar.org/member_portal/member-search"},
+  {name:"Alaska", url:"https://alaskabar.org/for-lawyers/member-directories/"},
+  {name:"Arizona", url:"https://azbar.org/for-legal-professionals/practice-tools-management/member-directory/"},
+  {name:"Arkansas", url:"https://attorneyinfo.aoc.arkansas.gov/info/attorney_search/info/attorney/attorneysearch.aspx"},
+  {name:"California", url:"https://apps.calbar.ca.gov/attorney/LicenseeSearch/QuickSearch"},
+  {name:"Colorado", url:"https://www.coloradolegalregulation.com/attorney-search/"},
+  {name:"Connecticut", url:"https://www.jud.ct.gov/AttorneyFirmInquiry/"},
+  {name:"Delaware", url:"https://rp470541.doelegal.com/vwPublicSearch/Show-VwPublicSearch-Table.aspx"},
+  {name:"District of Columbia", url:"https://my.dcbar.org/memberdirectory"},
+  {name:"Florida", url:"https://www.floridabar.org/directories/find-mbr/"},
+  {name:"Georgia", url:"https://www.gabar.org/member-directory/"},
+  {name:"Hawaii", url:"https://hsba.org/member-directory"},
+  {name:"Idaho", url:"https://isb.idaho.gov/licensing-mcle/attorney-roster-search/"},
+  {name:"Illinois", url:"https://www.iardc.org/Lawyer/Search"},
+  {name:"Indiana", url:"https://courtapps.in.gov/rollofattorneys/search"},
+  {name:"Iowa", url:"https://www.iacourtcommissions.org/ords/f?p=106:10"},
+  {name:"Kansas", url:"https://directory-kard.kscourts.gov/"},
+  {name:"Kentucky", url:"https://kybar.org/For-Public/Find-a-Lawyer"},
+  {name:"Louisiana", url:"https://www.lsba.org/MD321654/MembershipDirectory.aspx"},
+  {name:"Maine", url:"https://apps.web.maine.gov/cgi-bin/online/maine_bar/attorney_directory.pl"},
+  {name:"Maryland", url:"https://www.courts.state.md.us/attysearch"},
+  {name:"Massachusetts", url:"https://www.massbbo.org", limited:true, note:"No public search tool — contact the Board of Bar Overseers directly."},
+  {name:"Michigan", url:"https://www.michbar.org/memberdirectory/home"},
+  {name:"Minnesota", url:"https://lprb.mncourts.gov/LawyerSearch/Pages/default.aspx"},
+  {name:"Mississippi", url:"https://msbar.reliaguide.com/home"},
+  {name:"Missouri", url:"https://mobar.org/site/For_the_Public/Official_Directory_of_Lawyers/site/content/For-the-Public/Lawyer_Directory.aspx"},
+  {name:"Montana", url:"https://www.montanabar.org/For-Attorneys/Attorney-Directory"},
+  {name:"Nebraska", url:"https://attorneys.nejudicial.gov/member-search"},
+  {name:"Nevada", url:"https://nvbar.org/for-the-public/find-a-lawyer/"},
+  {name:"New Hampshire", url:"https://www.nhbar.org/attorney-verification-good-standing-request", limited:true, note:"No public search tool — request verification directly from the NH Bar."},
+  {name:"New Jersey", url:"https://www.njcourts.gov/", limited:true, note:"No public search tool — call the Board of Bar Examiners at (609) 984-2111."},
+  {name:"New Mexico", url:"https://www.sbnm.org/For-Public/I-Need-a-Lawyer/Online-Bar-Directory"},
+  {name:"New York", url:"https://iapps.courts.state.ny.us/attorneyservices/search?0"},
+  {name:"North Carolina", url:"https://portal.ncbar.gov/verification/search.aspx"},
+  {name:"North Dakota", url:"https://www.ndcourts.gov/lawyers"},
+  {name:"Ohio", url:"https://www.supremecourt.ohio.gov/attorneysearch/#/search"},
+  {name:"Oklahoma", url:"https://www.okbar.org/findalawyer/", note:"Attorneys in good standing may opt out, so this list isn't exhaustive."},
+  {name:"Oregon", url:"https://www.osbar.org/members/membersearch_start.asp"},
+  {name:"Pennsylvania", url:"https://www.padisciplinaryboard.org/for-the-public/find-attorney"},
+  {name:"Rhode Island", url:"http://rijrs.courts.ri.gov/rijrs/attorney.do"},
+  {name:"South Carolina", url:"https://www.sccourts.org/attorneys/"},
+  {name:"South Dakota", url:"https://www.statebarofsouthdakota.com", limited:true, note:"No public search tool — call the State Bar at (800) 952-2333."},
+  {name:"Tennessee", url:"https://www.tbpr.org/for-the-public/online-attorney-directory"},
+  {name:"Texas", url:"https://www.texasbar.com/AM/Template.cfm?Section=Find_A_Lawyer&Template=/CustomSource/MemberDirectory/Search_Form_Client_Main.cfm"},
+  {name:"Utah", url:"https://services.utahbar.org/Member-Directory"},
+  {name:"Vermont", url:"https://www.vermontjudiciary.org/attorneys/attorney-licensing"},
+  {name:"Virginia", url:"https://www.vsb.org/Site/Shared_Content/Directory/va-lawyer-directory.aspx", note:"Attorneys in good standing may opt out, so this list isn't exhaustive."},
+  {name:"Washington", url:"https://www.mywsba.org/PersonifyEbusiness/Default.aspx?TabID=1536"},
+  {name:"West Virginia", url:"https://mywvbar.org/membership-search-members"},
+  {name:"Wisconsin", url:"https://www.wisbar.org/Pages/BasicLawyerSearch.aspx"},
+  {name:"Wyoming", url:"https://www.wyomingbar.org/for-the-public/hire-a-lawyer/lawyer-search/"}
+];
+
+const grid = document.getElementById('grid');
+const searchInput = document.getElementById('stateSearch');
+const resultCount = document.getElementById('resultCount');
+const noResults = document.getElementById('noResults');
+
+function render(list){
+  grid.innerHTML = '';
+  list.forEach(s => {
+    const a = document.createElement('a');
+    a.className = 'card';
+    a.href = s.url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.title = s.note ? s.note : `Search the ${s.name} directory`;
+
+    const statusClass = s.limited ? 'limited' : 'available';
+    const statusText = s.limited ? 'Call to verify' : 'Search directory';
+
+    a.innerHTML = `
+      <span class="arrow">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M4 10L10 4M10 4H5M10 4V9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <div class="state-name">${s.name}</div>
+      <div class="status ${statusClass}"><span class="status-dot"></span>${statusText}</div>
+    `;
+    grid.appendChild(a);
+  });
+  resultCount.textContent = `${list.length} jurisdiction${list.length === 1 ? '' : 's'}`;
+  noResults.style.display = list.length === 0 ? 'block' : 'none';
+}
+
+render(states);
+
+searchInput.addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  const filtered = states.filter(s => s.name.toLowerCase().includes(q));
+  render(filtered);
+});
+
+/* ---------- Hiring & Empowering Solutions logo (embedded so this file is self-contained) ---------- */
+const HE_LOGO = "data:image/png;base64,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";
+document.querySelectorAll('img[data-logo]').forEach(img => { img.src = HE_LOGO; });
+
+/* ---------- Pop-up advertisement ---------- */
+const PROMO_DELAY_MS = 6000;   // how long a visitor is on the page before the pop-up appears
+
+const promoScrim   = document.getElementById('promoScrim');
+const promo        = document.getElementById('promo');
+const promoClose   = document.getElementById('promoClose');
+const promoDismiss = document.getElementById('promoDismiss');
+let promoShown = false;
+let lastFocused = null;
+
+function openPromo(){
+  if (promoShown) return;
+  // Don't interrupt someone mid-search — wait until they leave the box.
+  if (document.activeElement === searchInput && searchInput.value.trim() !== ''){
+    searchInput.addEventListener('blur', openPromo, { once: true });
+    return;
+  }
+  promoShown = true;
+  lastFocused = document.activeElement;
+  promoScrim.classList.add('is-open');
+  document.body.classList.add('promo-lock');
+  promo.focus();
+}
+
+function closePromo(){
+  promoScrim.classList.remove('is-open');
+  document.body.classList.remove('promo-lock');
+  if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+}
+
+promoClose.addEventListener('click', closePromo);
+promoDismiss.addEventListener('click', closePromo);
+promoScrim.addEventListener('click', (e) => { if (e.target === promoScrim) closePromo(); });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && promoScrim.classList.contains('is-open')) closePromo();
+});
+
+// Keep keyboard focus inside the dialog while it's open.
+promo.addEventListener('keydown', (e) => {
+  if (e.key !== 'Tab') return;
+  const focusable = promo.querySelectorAll('a[href], button:not([disabled])');
+  const first = focusable[0], last = focusable[focusable.length - 1];
+  if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+});
+
+setTimeout(openPromo, PROMO_DELAY_MS);
+</script>
+
+</body>
+</html>
